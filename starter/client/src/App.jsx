@@ -24,9 +24,14 @@ export default function App() {
   function logInLogOutButton() {
     if (isAuthenticated) {
       return (
-        <Menu.Item name="logout" onClick={() => logout({ returnTo: window.location.origin })}>
-          Log Out
-        </Menu.Item>
+        <>
+          <Menu.Item>
+            {user.name}
+          </Menu.Item>
+          <Menu.Item name="logout" onClick={() => logout({ returnTo: window.location.origin })}>
+            Log Out
+          </Menu.Item>
+        </>
       )
     } else {
       return (
@@ -37,7 +42,7 @@ export default function App() {
     }
   }
 
-  const { isAuthenticated, isLoading, loginWithRedirect, logout } = useAuth0()
+  const { isAuthenticated, isLoading, loginWithRedirect, logout, user } = useAuth0()
 
   return (
     <div>

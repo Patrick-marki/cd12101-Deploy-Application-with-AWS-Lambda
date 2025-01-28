@@ -1,14 +1,12 @@
-import Axios from 'axios'
-import jsonwebtoken from 'jsonwebtoken'
-import { createLogger } from '../../utils/logger.mjs'
+import pkg from 'jsonwebtoken';
+const { verify, decode } = pkg;
+import axios from 'axios';
 
-const logger = createLogger('auth')
-
-const jwksUrl = 'https://test-endpoint.auth0.com/.well-known/jwks.json'
-
-export async function handler(event) {
+export const handler = async (event) => {
+  console.log('Authorizing a user', event.authorizationToken)
   try {
     const jwtToken = await verifyToken(event.authorizationToken)
+    console.log('User was authorized', jwtToken)
 
     return {
       principalId: jwtToken.sub,
@@ -24,7 +22,7 @@ export async function handler(event) {
       }
     }
   } catch (e) {
-    logger.error('User not authorized', { error: e.message })
+    console.error('User not authorized', { error: e.message })
 
     return {
       principalId: 'user',
@@ -44,10 +42,19 @@ export async function handler(event) {
 
 async function verifyToken(authHeader) {
   const token = getToken(authHeader)
-  const jwt = jsonwebtoken.decode(token, { complete: true })
+  const jwksUrl = `https://${process.env.AUTH0_DOMAIN}/.well-known/jwks.json`
 
-  // TODO: Implement token verification
-  return undefined;
+  const response = await axios.get(jwksUrl)
+  const keys = response.data.keys
+  const signingKeys = keys.find(key => key.use === 'sig' && key.kty === 'RSA' && key.kid && key.x5c && key.x5c.length)
+
+  if (!signingKeys) {
+    throw new Error('No signing keys found')
+  }
+
+  const publicKey = `-----BEGIN CERTIFICATE-----\n${signingKeys.x5c[0]}\n-----END CERTIFICATE-----`
+
+  return verify(token, publicKey, { algorithms: ['RS256'] })
 }
 
 function getToken(authHeader) {

@@ -10,3 +10,7 @@ jspm_packages
 
 # Local DynamoDb
 .dynamodb
+
+# Envs
+set_env.bat
+set_env.sh

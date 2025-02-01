@@ -9,8 +9,13 @@ export const handler = async (event) => {
   console.log('Processing event: ', event)
 
   const userId = getUserId(event)
+  console.log(`Extracted userId: ${userId}`)
+
   const todoId = uuidv4()
+  console.log(`Generated todoId: ${todoId}`)
+
   const newTodo = JSON.parse(event.body)
+  console.log('Parsed newTodo: ', newTodo)
 
   const newItem = {
     userId,
@@ -19,11 +24,13 @@ export const handler = async (event) => {
     ...newTodo,
     attachmentUrl: ``
   }
+  console.log('Constructed newItem: ', newItem)
 
   await docClient.put({
     TableName: todosTable,
     Item: newItem
   }).promise()
+  console.log(`Successfully inserted newItem with todoId: ${todoId} into table: ${todosTable}`)
 
   return {
     statusCode: 201,

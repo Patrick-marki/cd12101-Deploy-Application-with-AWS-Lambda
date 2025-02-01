@@ -9,6 +9,7 @@ export const handler = async (event) => {
   console.log('Processing event: ', event)
 
   const userId = getUserId(event)
+  console.log('Retrieved userId: ', userId)
 
   const result = await docClient.query({
     TableName: todosTable,
@@ -18,8 +19,10 @@ export const handler = async (event) => {
       ':userId': userId
     }
   }).promise()
+  console.log('Query result: ', result)
 
   const items = result.Items
+  console.log('Retrieved items: ', items)
 
   return {
     statusCode: 200,

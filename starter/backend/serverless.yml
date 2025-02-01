@@ -11,6 +11,9 @@ provider:
   runtime: nodejs16.x
   region: us-east-1
   stage: dev
+  tracing:
+    apiGateway: true
+    lambda: true
   environment:
     TODOS_TABLE: Todos-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: CreatedAtIndex

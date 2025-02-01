@@ -31,6 +31,7 @@ export const handler = async (event) => {
     },
     ReturnValues: 'ALL_NEW'
   }).promise()
+  console.log('Update result:', result)
 
   return {
     statusCode: 200,

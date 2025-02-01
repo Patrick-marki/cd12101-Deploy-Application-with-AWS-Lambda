@@ -1,37 +1,11 @@
 import { getUserId } from '../utils.mjs'
-import AWS from 'aws-sdk'
-
-const docClient = new AWS.DynamoDB.DocumentClient()
-const todosTable = process.env.TODOS_TABLE
+import { updateTodoItem } from '../../businessLogic/todos.mjs'
 
 export const handler = async (event) => {
-  console.log('Processing event: ', event)
-
   const userId = getUserId(event)
   const todoId = event.pathParameters.todoId
   const updatedTodo = JSON.parse(event.body)
-  console.log('userId:', userId)
-  console.log('todoId:', todoId)
-  console.log('updatedTodo:', updatedTodo)
-  
-  const result = await docClient.update({
-    TableName: todosTable,
-    Key: {
-      userId,
-      todoId
-    },
-    UpdateExpression: 'set #name = :name, dueDate = :dueDate, done = :done',
-    ExpressionAttributeNames: {
-      '#name': 'name'
-    },
-    ExpressionAttributeValues: {
-      ':name': updatedTodo.name,
-      ':dueDate': updatedTodo.dueDate,
-      ':done': updatedTodo.done
-    },
-    ReturnValues: 'ALL_NEW'
-  }).promise()
-  console.log('Update result:', result)
+  const updatedItem = await updateTodoItem(userId, todoId, updatedTodo)
 
   return {
     statusCode: 200,
@@ -40,7 +14,7 @@ export const handler = async (event) => {
       'Access-Control-Allow-Credentials': true
     },
     body: JSON.stringify({
-      item: result.Attributes
+      item: updatedItem
     })
   }
 }

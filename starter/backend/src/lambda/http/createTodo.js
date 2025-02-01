@@ -1,36 +1,16 @@
-import { v4 as uuidv4 } from 'uuid'
 import { getUserId } from '../utils.mjs'
-import AWS from 'aws-sdk'
-
-const docClient = new AWS.DynamoDB.DocumentClient()
-const todosTable = process.env.TODOS_TABLE
+import { createTodoItem } from '../../businessLogic/todos.mjs'
 
 export const handler = async (event) => {
   console.log('Processing event: ', event)
 
   const userId = getUserId(event)
-  console.log(`Extracted userId: ${userId}`)
-
-  const todoId = uuidv4()
-  console.log(`Generated todoId: ${todoId}`)
-
   const newTodo = JSON.parse(event.body)
-  console.log('Parsed newTodo: ', newTodo)
+  console.log('userId:', userId)
+  console.log('newTodo:', newTodo)
 
-  const newItem = {
-    userId,
-    todoId,
-    createdAt: new Date().toISOString(),
-    ...newTodo,
-    attachmentUrl: ``
-  }
-  console.log('Constructed newItem: ', newItem)
-
-  await docClient.put({
-    TableName: todosTable,
-    Item: newItem
-  }).promise()
-  console.log(`Successfully inserted newItem with todoId: ${todoId} into table: ${todosTable}`)
+  const newItem = await createTodoItem(userId, newTodo)
+  console.log('Created new todo item:', newItem)
 
   return {
     statusCode: 201,

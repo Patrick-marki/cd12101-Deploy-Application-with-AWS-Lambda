@@ -1,6 +1,9 @@
-import AWS from 'aws-sdk'
+import AWSXRay from 'aws-xray-sdk';
+import AWS from 'aws-sdk';
 
-const docClient = new AWS.DynamoDB.DocumentClient()
+const XAWS = AWSXRay.captureAWS(AWS);
+
+const docClient = new XAWS.DynamoDB.DocumentClient()
 const todosTable = process.env.TODOS_TABLE
 
 export async function getTodoById(userId, todoId) {

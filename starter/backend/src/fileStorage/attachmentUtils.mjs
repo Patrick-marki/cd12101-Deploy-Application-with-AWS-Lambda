@@ -1,6 +1,9 @@
 import AWS from 'aws-sdk'
+import AWSXray from 'aws-xray-sdk'  
 
-const s3 = new AWS.S3({
+const XAWS = AWSXray.captureAWS(AWS)
+
+const s3 = new XAWS.S3({
   signatureVersion: 'v4'
 })
 const bucketName = process.env.ATTACHMENTS_S3_BUCKET
